@@ -6,6 +6,7 @@ import { FeedScopeProvider } from './contexts/FeedScopeContext'
 import { useIsLaunched } from './lib/launch'
 import AppLayout from './components/layout/AppLayout'
 import OnboardingModal from './components/OnboardingModal'
+import EULAGateModal from './components/EULAGateModal'
 import LandingPage from './pages/landing/LandingPage'
 import SignIn from './pages/auth/SignIn'
 import SignUp from './pages/auth/SignUp'
@@ -39,6 +40,7 @@ import CreateShopPage from './pages/marketplace/CreateShopPage'
 import ShopDetailPage from './pages/marketplace/ShopDetailPage'
 import ScanPage from './pages/scan/ScanPage'
 import QRPage from './pages/qr/QRPage'
+import EULAPage from './pages/legal/EULAPage'
 
 function RootRoute() {
   const { session, loading } = useAuth()
@@ -89,11 +91,14 @@ function IncomingCallToast() {
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, loading, profile } = useAuth()
   const [dismissed, setDismissed] = useState(false)
+  const [eulaAccepted, setEulaAccepted] = useState(false)
   if (loading) return <LoadingScreen />
   if (!session) return <Navigate to="/" replace />
-  const showOnboarding = profile && profile.onboarded === false && !dismissed
+  const showEulaGate = profile && !profile.terms_accepted_at && !eulaAccepted
+  const showOnboarding = !showEulaGate && profile && profile.onboarded === false && !dismissed
   return (
     <AppLayout>
+      {showEulaGate && <EULAGateModal onDone={() => setEulaAccepted(true)} />}
       {showOnboarding && <OnboardingModal onDone={() => setDismissed(true)} />}
       <IncomingCallToast />
       {children}
@@ -181,6 +186,7 @@ function AppRoutes() {
       <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
       <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/legal/eula" element={<EULAPage />} />
       <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
       <Route path="/discovery" element={<ProtectedRoute><DiscoveryPage /></ProtectedRoute>} />
       <Route path="/leadership" element={<ProtectedRoute><LeadershipPage /></ProtectedRoute>} />

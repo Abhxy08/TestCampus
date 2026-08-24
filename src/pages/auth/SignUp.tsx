@@ -20,6 +20,7 @@ export default function SignUp() {
   const [googleLoading, setGLoading]  = useState(false)
   const [error, setError]             = useState('')
   const [success, setSuccess]         = useState(false)
+  const [agreedToEula, setAgreedToEula] = useState(false)
 
   // username availability
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
@@ -43,6 +44,7 @@ export default function SignUp() {
     if (!USERNAME_RE.test(username)) { setError('Username must be 3–20 characters: letters, numbers, underscores only.'); return }
     if (usernameStatus === 'taken') { setError('That username is already taken.'); return }
     if (usernameStatus === 'checking') { setError('Still checking username availability — please wait a moment.'); return }
+    if (!agreedToEula) { setError('You must agree to the EULA / Terms of Service to continue.'); return }
     setLoading(true)
     const { data, error: signUpError } = await supabase.auth.signUp({
       email, password,
@@ -50,11 +52,9 @@ export default function SignUp() {
     })
     if (signUpError) { setError(signUpError.message); setLoading(false); return }
     if (data.user) {
-      const updates: Record<string, string> = {}
+      const updates: Record<string, string> = { terms_accepted_at: new Date().toISOString() }
       if (username)  updates.username = username
-      if (Object.keys(updates).length) {
-        await supabase.from('profiles').update(updates).eq('id', data.user.id)
-      }
+      await supabase.from('profiles').update(updates).eq('id', data.user.id)
     }
     setSuccess(true)
     setLoading(false)
@@ -160,18 +160,26 @@ export default function SignUp() {
 
         {error && <ErrorBox message={error} />}
 
+        <label style={{ display:'flex', alignItems:'flex-start', gap:9, cursor:'pointer' }}>
+          <input
+            type="checkbox"
+            checked={agreedToEula}
+            onChange={e => setAgreedToEula(e.target.checked)}
+            style={{ marginTop:2, width:15, height:15, accentColor:'#c0255a', flexShrink:0, cursor:'pointer' }}
+          />
+          <span style={{ fontSize:12, color:'rgba(243,221,223,.45)', lineHeight:1.6 }}>
+            I agree to the <Link to="/legal/eula" target="_blank" className="auth-link" style={{ fontWeight:700 }}>EULA / Terms of Service</Link>.
+          </span>
+        </label>
+
         <button
           type="submit"
-          disabled={loading || usernameStatus === 'taken' || usernameStatus === 'checking'}
+          disabled={loading || usernameStatus === 'taken' || usernameStatus === 'checking' || !agreedToEula}
           className="auth-btn"
-          style={{ marginTop:4, opacity: (loading || usernameStatus === 'taken' || usernameStatus === 'checking') ? .65 : 1 }}
+          style={{ marginTop:4, opacity: (loading || usernameStatus === 'taken' || usernameStatus === 'checking' || !agreedToEula) ? .65 : 1 }}
         >
           {loading ? 'Creating account…' : 'Create Free Account →'}
         </button>
-
-        <p style={{ fontSize:11, color:'rgba(243,221,223,.17)', textAlign:'center', lineHeight:1.6, margin:0 }}>
-          By signing up you agree to our terms of service.
-        </p>
       </form>
 
       <p style={{ textAlign:'center', marginTop:20, fontSize:13.5, color:'rgba(243,221,223,.32)' }}>

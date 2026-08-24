@@ -23,6 +23,7 @@ export interface Profile {
   interests: string[]
   karak_points: number
   onboarded: boolean
+  terms_accepted_at: string | null
   created_at: string
   school: string | null
   email: string | null
