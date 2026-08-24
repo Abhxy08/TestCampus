@@ -31,7 +31,7 @@ const SECTIONS: { title: string; body: string }[] = [
   },
   {
     title: '8. Events & Check-Ins',
-    body: 'Event registration, QR check-ins, and attendance data are used to operate event features and may be shared with the hosting club. Registration status is managed by clubs and is not guaranteed until confirmed in-app.',
+    body: 'Event registration, QR check-ins, and attendance data are used to operate event features and may be shared with the hosting club. Registration status is managed by clubs and is not guaranteed until confirmed in-app. Events are hosted and run by the clubs themselves, not by ClubSynq — ClubSynq is not responsible for the conduct, safety, cancellation, or outcome of any event hosted by a club.',
   },
   {
     title: '9. Marketplace & Skill Souq',
@@ -73,10 +73,7 @@ export default function EULAPage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap');`}</style>
       <div style={{ maxWidth:680, margin:'0 auto' }}>
         <Link to="/signup" style={{ color:'#c0255a', textDecoration:'none', fontSize:13, fontWeight:700 }}>← Back</Link>
-        <h1 style={{ fontSize:26, fontWeight:900, color:'#f3dddf', letterSpacing:'-.5px', margin:'18px 0 6px' }}>End User License Agreement</h1>
-        <p style={{ fontSize:13, color:'rgba(243,221,223,.35)', marginBottom:32 }}>
-          Drafted for ClubSynq's current setup — have it reviewed by a lawyer before public launch, and update it once the operating entity is formally registered.
-        </p>
+        <h1 style={{ fontSize:26, fontWeight:900, color:'#f3dddf', letterSpacing:'-.5px', margin:'18px 0 32px' }}>End User License Agreement</h1>
         {SECTIONS.map(s => (
           <div key={s.title} style={{ marginBottom:22 }}>
             <h2 style={{ fontSize:15, fontWeight:800, color:'#e0aab4', marginBottom:6 }}>{s.title}</h2>
